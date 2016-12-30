@@ -368,6 +368,16 @@ a.social i {
   top: -200px;
 }
 
+.faq,
+.press {
+  margin-top: 1em;
+}
+
+.faq h4,
+.press h4 {
+  margin-bottom: 0;
+}
+
 footer {
   margin-top: 40px;
   height: 200px;
