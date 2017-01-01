@@ -1,28 +1,33 @@
 (function(){
-  var formElement = document.getElementById('email');
 
-  formElement.addEventListener('submit', function(formSubmitEvent){
-    var formAction = 'https://script.google.com/macros/s/AKfycbw09Ueu_doOlJXDxL_olw75cs3Ci9UtR2gjgI5D4nS9endcHgMT/exec';
-    var sheetName = 'email-list';
-    var formData, formSubmit;
-    formSubmitEvent.preventDefault();
-    
-    this.classList.add('submitting');
-    formData = new FormData(this);
-    formData.append('sheet_name', sheetName);
+  function isLocal(){
+    return document.location.origin.search('localhost') > -1;
+  }
 
-    formSubmit = new XMLHttpRequest();
-    formSubmit.addEventListener("load", submitComplete.bind(this));
-    formSubmit.open("POST", formAction, true);
-    formSubmit.send(formData);
+  function makeAttributeReplacer(attributeName){
+    var remoteOrigin = '//fruitsharehouston.github.io';
 
-    function submitComplete () {
-      var thankYou = this.parentNode.parentNode.getElementsByClassName('thank-you');
-      this.classList.remove('submitting');
-      this.classList.add('closed');
-      thankYou[0].classList.remove('closed');
+    // make a function that will handle each element's attribute update based on
+    // different attribute names.
+    return function(){
+      var $item = $(this);
+      var itemAttribute = $item.attr(attributeName);
+
+      // if the item has the attribute and the attribute is set to the remote origin,
+      // replace the attribute locally with the local origin.
+      if(itemAttribute && itemAttribute.search(remoteOrigin) > -1){
+        $item.attr(attributeName, itemAttribute.replace(remoteOrigin, document.location.origin));
+      }
     }
+  }
 
-  });
+  function setupRoutes(){
+    if(isLocal()){
+      $('a, link').each(makeAttributeReplacer('href'));
+      $('img, script').each(makeAttributeReplacer('src'));
+    }
+  }
+
+  setupRoutes();
 
 })();
